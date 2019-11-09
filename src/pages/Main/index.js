@@ -1,13 +1,71 @@
-import React from 'react';
-import { Title } from './styles';
+import React, { Component } from 'react';
+import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
 
-// import { Container } from './styles';
+import api from '../../services/api';
+import { Container, Form, SubmitButton } from './styles';
 
-export default function Main() {
-  return (
-    <Title error={false}>
-      Hello World
-      <span>menor</span>
-    </Title>
-  );
+export default class Main extends Component {
+  // eslint-disable-next-line react/state-in-constructor
+  state = {
+    newRepository: '',
+    repositories: [],
+    loading: false,
+  };
+
+  handleInputChange = e => {
+    this.setState({ newRepository: e.target.value });
+  };
+
+  handleSubmit = async e => {
+    e.preventDefault();
+
+    this.setState({ loading: true });
+
+    const { newRepository, repositories } = this.state;
+
+    const response = await api.get(`/repos/${newRepository}`);
+
+    const data = {
+      name: response.data.full_name,
+    };
+
+    this.setState({
+      // Cria um vetor novo e copia todos os dados e
+      // adiciona no final o novo data
+      // Mantendo a imutabilidade
+      repositories: [...repositories, data],
+      newRepository: '',
+      loading: false,
+    });
+  };
+
+  render() {
+    const { newRepository, loading } = this.state;
+
+    return (
+      <Container>
+        <h1>
+          <FaGithubAlt />
+          Repositórios
+        </h1>
+
+        <Form onSubmit={this.handleSubmit}>
+          <input
+            type="text"
+            placeholder="Adicionar repositório"
+            value={newRepository}
+            onChange={this.handleInputChange}
+          />
+
+          <SubmitButton loading={loading}>
+            {loading ? (
+              <FaSpinner color="#FFF" size={14} />
+            ) : (
+              <FaPlus color="#FFF" size={14} />
+            )}
+          </SubmitButton>
+        </Form>
+      </Container>
+    );
+  }
 }

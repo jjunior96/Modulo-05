@@ -35,6 +35,8 @@ export default class Main extends Component {
     this.setState({ newRepository: e.target.value });
   };
 
+  // Verificar se o repositorio informado
+  // é valido
   handleSubmit = async e => {
     e.preventDefault();
 
